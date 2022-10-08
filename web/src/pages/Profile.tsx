@@ -1,13 +1,20 @@
-import { Link } from "react-router-dom";
+import { useContext, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { DateSelect } from "../components/DateSelect";
 import { Header } from "../components/Header";
-import { IconArrowLeft } from "../components/IconArrowLeft";
-import { IconArrowRight } from "../components/IconArrowRight";
 import { IconBack } from "../components/IconBack";
 import { ScoreboardCard } from "../components/ScoreboardCard";
+import { AuthContext } from "../context/AuthContext";
 
 export function Profile() {
-  
+  const { user, handleSignOut } = useContext(AuthContext)
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if(!user) {
+      navigate('/login')
+    }
+  }, [user])
 
   return (
     <div className="flex flex-col w-full items-center">

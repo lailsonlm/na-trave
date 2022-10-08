@@ -1,8 +1,20 @@
+import { useContext, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { DateSelect } from "../components/DateSelect";
 import { Header } from "../components/Header";
 import { ScoreboardCard } from "../components/ScoreboardCard";
+import { AuthContext } from "../context/AuthContext";
 
 export function Dashboard() {
+  const { user, handleSignOut } = useContext(AuthContext)
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if(!user) {
+      navigate('/login')
+    }
+  }, [user])
+
   return (
     <div className="flex flex-col w-full items-center">
       <div className="flex flex-col w-full bg-red-500 items-center justify-center text-white">

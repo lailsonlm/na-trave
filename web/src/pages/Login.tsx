@@ -1,8 +1,19 @@
-import { Link } from "react-router-dom";
+import { useContext, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Header } from "../components/Header";
 import { IconBack } from "../components/IconBack";
+import { AuthContext } from "../context/AuthContext";
 
 export function Login() {
+  const { user, handleSignIn } = useContext(AuthContext)
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if(user) {
+      navigate('/dashboard')
+    }
+  }, [user])
+  
   return (
     <div className="flex flex-col items-center w-full">
       <Header logo="/logo-login.svg" isLoginPage />

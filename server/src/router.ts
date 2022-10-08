@@ -15,7 +15,7 @@ type User = {
   password: string;
 }
 
-router.post('/user', checksExistsUserAccount, async ctx => {
+router.post('/signup', checksExistsUserAccount, async ctx => {
   const body = ctx.request.body
   const saltRounds = 10
   
@@ -44,7 +44,20 @@ router.post('/user', checksExistsUserAccount, async ctx => {
       }   
     })
 
-    ctx.body = user
+    const accessToken = jwt.sign({
+      sub: user.id,
+    }, process.env.JWT_SECRET as string, {
+      expiresIn: '24h'
+    })
+
+    ctx.body = {
+      name: user.name,
+      username: user.username,
+      email: user.email,
+      id: user.id,
+      accessToken
+    }
+    
     ctx.status = 201
 
   } catch (error) {
@@ -163,12 +176,44 @@ router.get('/login', async ctx => {
   })
 
   ctx.body = {
-    user: {
+    name: user.name,
+    username: user.username,
+    email: user.email,
+    id: user.id,
+    accessToken
+  }
+})
+
+router.get('/user', async ctx => {
+  const [type, token] = ctx.headers.authorization ? ctx.headers.authorization.split(' ') : ''
+
+  try {
+    const payload = jwt.verify(token, process.env.JWT_SECRET as string);
+
+    const user = await prisma.user.findUnique({
+      where: {
+        id: payload.sub as string,
+      }
+    })
+
+    if(!user) {
+      ctx.status = 404
+      return
+    }
+
+
+    ctx.body = {
       name: user.name,
       username: user.username,
       email: user.email,
       id: user.id,
-    },
-    accessToken
+      accessToken: token
+    }
+  
+    
+  } catch(err) {
+    ctx.status = 404
+    return
   }
+
 })

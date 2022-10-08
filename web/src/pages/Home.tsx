@@ -1,7 +1,18 @@
-import { Link } from "react-router-dom"
+import { useContext, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom"
 import { Header } from "../components/Header"
+import { AuthContext } from "../context/AuthContext";
 
 export function Home() {
+  const { user } = useContext(AuthContext)
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if(user) {
+      navigate('/dashboard')
+    }
+  }, [user])
+  
   return (
     <div className="min-h-screen h-full bg-red-700 text-white flex flex-col items-center px-5 pb-5">
       <Header logo="/logo-home.svg" />
