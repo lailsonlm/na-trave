@@ -2,13 +2,13 @@
   "name": "server",
   "version": "1.0.0",
   "description": "",
-  "main": "src/server.js",
+  "main": "server.js",
   "scripts": {
     "build": "tsc",
-    "dev": "tsnd --exit-child src/server.ts"
+    "dev": "tsnd --exit-child api/server.ts"
   },
   "prisma": {
-    "seed": "ts-node src/seed.ts"
+    "seed": "ts-node api/seed.ts"
   },
   "keywords": [],
   "author": {

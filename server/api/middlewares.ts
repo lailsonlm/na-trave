@@ -1,6 +1,7 @@
 import { Context, Next } from 'koa';
 import { prisma } from './prisma';
 
+
 export async function checksExistsUserAccount(ctx: Context, next: Next) {
   const body = ctx.request.body
   const email = body && body.email as string;
