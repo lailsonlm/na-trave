@@ -4,7 +4,6 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "build": "tsc build --output public",
     "dev": "tsnd --exit-child api/server.ts"
   },
   "prisma": {
