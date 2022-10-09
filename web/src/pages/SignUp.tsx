@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
+import { CircleNotch } from "phosphor-react";
 import { useFormik } from "formik";
 import * as yup from 'yup'
 
@@ -60,6 +61,7 @@ export function SignUp() {
         </div>
 
         <form onSubmit={formik.handleSubmit} className="mt-8 flex flex-col">
+        {formik.status && <p className="text-red-500 text-sm text-center">{formik.status}</p>}
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
               <label 
@@ -144,10 +146,18 @@ export function SignUp() {
 
           <button 
             type="submit"
-            disabled={!formik.isValid}
+            disabled={!formik.isValid || formik.isSubmitting}
             className="bg-red-500 rounded-2xl text-white px-5 py-3 md:px-6 md:py-4 mt-8 font-bold hover:bg-red-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Criar minha conta
+            {
+            formik.isSubmitting ? 
+              <CircleNotch 
+                size={24}
+                weight="bold" 
+                className="animate-spin text-white mx-auto" 
+              /> 
+              : 'Criar minha conta'
+            } 
           </button>
         </form>
       </main>

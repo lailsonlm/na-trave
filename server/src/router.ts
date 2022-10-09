@@ -51,10 +51,12 @@ router.post('/signup', checksExistsUserAccount, async ctx => {
     })
 
     ctx.body = {
-      name: user.name,
-      username: user.username,
-      email: user.email,
-      id: user.id,
+      user: {
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        id: user.id,
+      },
       accessToken
     }
     
@@ -71,10 +73,9 @@ router.post('/hunch', checksExistsGameId, async ctx => {
 
   try {
     const data = jwt.verify(token, process.env.JWT_SECRET as string)
-
     const body = ctx.request.body
-    
-    if(!body || !body.homeTeamScore || !body.awayTeamScore) {
+
+    if(!body) {
       ctx.status = 400
       return
     }
@@ -120,6 +121,40 @@ router.post('/hunch', checksExistsGameId, async ctx => {
   }
   
 })
+
+router.get('/hunches/:username', async ctx => {
+  const username = ctx.params.username
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        username
+      }
+    })
+
+    if(!user) {
+      ctx.body = "User does not exists"
+      ctx.status = 404
+      return
+    }
+
+    const hunches = await prisma.hunch.findMany({
+      where: {
+        userId: user.id
+      }
+    })
+
+    ctx.body = {
+      name: user.name,
+      hunches
+    }
+    ctx.status = 200
+
+  } catch (error) {
+    ctx.body = error
+    ctx.status = 500
+  }
+});
 
 router.get('/games', async ctx => {
   const currentDate = ctx.request.query.gameTime as string
@@ -176,12 +211,15 @@ router.get('/login', async ctx => {
   })
 
   ctx.body = {
-    name: user.name,
-    username: user.username,
-    email: user.email,
-    id: user.id,
-    accessToken
+    user: {
+      name: user.name,
+      username: user.username,
+      email: user.email,
+      id: user.id,
+    },
+    accessToken,
   }
+  
 })
 
 router.get('/user', async ctx => {
@@ -203,10 +241,12 @@ router.get('/user', async ctx => {
 
 
     ctx.body = {
-      name: user.name,
-      username: user.username,
-      email: user.email,
-      id: user.id,
+      user: {
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        id: user.id,
+      },
       accessToken: token
     }
   

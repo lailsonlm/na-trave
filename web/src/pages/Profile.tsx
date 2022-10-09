@@ -1,20 +1,92 @@
-import { useContext, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { CircleNotch } from "phosphor-react";
+import { useContext, useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { DateSelect } from "../components/DateSelect";
 import { Header } from "../components/Header";
 import { IconBack } from "../components/IconBack";
 import { ScoreboardCard } from "../components/ScoreboardCard";
 import { AuthContext } from "../context/AuthContext";
+import { api } from "../services/api";
+
+type Game = {
+  id: string;
+  awayTeam: string;
+  gameTime: string;
+  homeTeam: string;
+}
+
+type Hunches = {
+  name: string;
+  hunches: {
+    id: string;
+    homeTeamScore: number;
+    awayTeamScore: number;
+    gameId: string;
+  }[]
+}
+
+type Hunch = {
+  id: string;
+  homeTeamScore: number;
+  awayTeamScore: number;
+}
 
 export function Profile() {
+  const initialDate = new Date(2022, 10, 20)
+  const [currentDate, setCurrentDate] = useState(initialDate)
+  const [isLoading, setIsLoading] = useState(false)
+  const [games, setGames] = useState<Game[]>()
+  const [hunches, setHunches] = useState<Hunches>()
+
+  const { username } = useParams<{ username: string }>()
+
+  const hunch = hunches?.hunches.reduce((acc, hunch) => {
+    acc[hunch.gameId] = hunch
+    return acc
+  }, {} as any[string])
+
   const { user, handleSignOut } = useContext(AuthContext)
   const navigate = useNavigate();
 
+  function onChangeDateSelect(date: Date) {
+    setCurrentDate(date)
+  }
+
+  // useEffect(() => {
+  //   if(!user) {
+  //     navigate('/')
+  //   }
+  // }, [user])
+  
+  async function getAllGames() {
+    // setIsLoading(true)
+
+    const response = await api.get<Game[]>('/games', {
+      params: {
+        gameTime: currentDate.toISOString()
+      }
+    })
+    setGames(response.data)
+
+    // setIsLoading(false)
+  }
+  
+  async function getAllHunches() {
+    setIsLoading(true)
+
+    const response = await api.get<Hunches>(`/hunches/${username}`)
+    setHunches(response.data)
+
+    setIsLoading(false)
+  }
+  
   useEffect(() => {
-    if(!user) {
-      navigate('/login')
-    }
-  }, [user])
+    getAllGames()
+  }, [currentDate])
+  
+  useEffect(() => {
+    getAllHunches()
+  }, [])
 
   return (
     <div className="flex flex-col w-full items-center">
@@ -24,22 +96,59 @@ export function Profile() {
         </div>
 
         <div className="flex flex-col w-full h-36 px-5 md:px-0 py-4 md:py-4 gap-4 max-w-[600px]">
-          <Link to="/dashboard" className="text-white">
-            <IconBack />
-          </Link>
-          <h2 className="text-xl md:text-2xl font-bold">Lailson Sobral</h2>
+          <div className="flex">
+            <Link to="/dashboard" className="text-white">
+              <IconBack />
+            </Link>
+          </div>
+          <h2 className="text-xl md:text-2xl font-bold">{hunches?.name}</h2>
         </div>
       </div>
 
-      <div className="flex flex-col py-4 w-full max-w-[600px] px-5 md:px-0 gap-4">
+      <div className="flex flex-col py-4 w-full max-w-[600px] px-5 md:px-0">
+        {username === user?.username && 
+          <div className="flex items-center justify-end">
+            <button 
+              className="text-xs md:text-sm font-bold hover:text-red-300"
+              onClick={handleSignOut}
+              title="Sair da minha conta"
+            >
+              Sair da minha conta
+            </button>
+          </div>
+        }
       <h2 className="text-xl md:text-2xl font-bold text-red-300 mt-10">Seus palpites</h2>
-        <DateSelect />
+       <DateSelect 
+          initialDate={initialDate} 
+          currentDate={currentDate}
+          onChangeDateSelect={onChangeDateSelect}
+        />
 
         <div className="flex flex-col p-4 md:px-0 gap-3 md:gap-4">
-          <ScoreboardCard />
-          <ScoreboardCard />
-          <ScoreboardCard />
-          <ScoreboardCard />
+          {isLoading ? 
+            <CircleNotch 
+              size={32}
+              weight="bold" 
+              className="animate-spin text-red-300 mx-auto" 
+            /> 
+            : 
+            games && games.length > 0 ? 
+              <div className="flex flex-col gap-3 md:gap-4">
+                {games?.map(game => {
+                  return (
+                    <ScoreboardCard 
+                      key={game.id} 
+                      game={game} 
+                      homeTeamScore={hunch[game.id]?.homeTeamScore === 0 ? '0' : hunch[game.id]?.homeTeamScore || ''} 
+                      awayTeamScore={hunch[game.id]?.awayTeamScore === 0 ? '0': hunch[game.id]?.awayTeamScore || ''} 
+                      isProfilePage
+                    />
+                  )
+                })}
+              </div>       
+              :
+              <p className="text-center">Não existem jogos para essa data.</p>
+            }
         </div>
         
       </div>

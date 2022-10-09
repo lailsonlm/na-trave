@@ -5,10 +5,14 @@ import { useState } from "react";
 import { IconArrowLeft } from './IconArrowLeft';
 import { IconArrowRight } from './IconArrowRight';
 
-export function DateSelect() {
-  const initialDate = new Date(2022, 10, 20)
+interface DateSelectProps {
+  initialDate: Date;
+  currentDate: Date;
+  onChangeDateSelect: (date: Date) => void;
+}
+
+export function DateSelect({ initialDate, currentDate, onChangeDateSelect }: DateSelectProps) {
   const finalDate = new Date(2022, 11, 18)
-  const [currentDate, setCurrentDate] = useState(initialDate)
   const formatDate = format(currentDate, "dd' de 'MMMM", {
     locale: ptBR
   })
@@ -17,24 +21,24 @@ export function DateSelect() {
     const prevDate = subDays(currentDate, 1)
 
     if(prevDate <= initialDate) {
-      setCurrentDate(initialDate)
+      onChangeDateSelect(initialDate)
 
       return
     }
 
-    setCurrentDate(prevDate)
+    onChangeDateSelect(prevDate)
   }
 
   function nextDay() {
     const nextDate = addDays(currentDate, 1)
 
     if(nextDate >= finalDate) {
-      setCurrentDate(finalDate)
+      onChangeDateSelect(finalDate)
 
       return
     }
     
-    setCurrentDate(nextDate)
+    onChangeDateSelect(nextDate)
   }
 
   return (

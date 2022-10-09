@@ -20,7 +20,6 @@ type User = {
   name: string,
   username: string,
   email: string,
-  accessToken: string,
 }
 
 interface HandleSignInProps {
@@ -43,8 +42,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | undefined>(undefined)
   const isAuthenticated = !!user;
 
-  console.log(cookies, user)
-
   async function handleSignUp(values: HandleSignUpProps) {
     const response = await api.post('/signup', {
       name: values.name,
@@ -53,7 +50,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       password: values.password,
     })
 
-    setUser(response.data)
+    setUser(response.data.user)
 
     setCookie('natrave.token', response.data.accessToken, {
       path: '/',
@@ -61,25 +58,25 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   async function handleSignIn(values: HandleSignInProps) {
-    // const response = await api.get('/login', {
-    //   auth: {
-    //     username: values.email,
-    //     password: values.password
-    //   }
-    // })
+    const response = await api.get('/login', {
+      auth: {
+        username: values.email,
+        password: values.password
+      }
+    })
 
-    // setUser(response.data)
+    setUser(response.data.user)
 
-    // setCookie('natrave.token', response.data.accessToken, {
-    //   path: '/',
-    // })
+    setCookie('natrave.token', response.data.accessToken, {
+      path: '/',
+    })
   }
   
   async function handleSignOut() {
     setUser(undefined)
     removeCookie('natrave.token')
     Navigate({
-      to: '/',
+      to: '/login',
     })    
   }
 
@@ -89,7 +86,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         Authorization: `Bearer ${cookies['natrave.token']}`
       }
      }).then(response => {
-        setUser(response.data)
+        setUser(response.data.user)
       })
       .catch((err) => {
         handleSignOut()
@@ -98,7 +95,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   useEffect(() => {
     if(cookies) {
-      console.log(cookies, 'cookies')
      getUser()
     }
   }, [])
