@@ -20,6 +20,7 @@
     "@koa/router": "^12.0.0",
     "@prisma/client": "^4.4.0",
     "bcrypt": "^5.1.0",
+    "bcryptjs": "^2.4.3",
     "date-fns": "^2.29.3",
     "jsonwebtoken": "^8.5.1",
     "koa": "^2.13.4",
@@ -27,6 +28,7 @@
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
+    "@types/bcryptjs": "^2.4.2",
     "@types/jsonwebtoken": "^8.5.9",
     "@types/koa": "^2.13.5",
     "@types/koa__cors": "^3.3.0",
