@@ -115,6 +115,7 @@ export function Profile() {
 
       <div className="flex flex-col py-4 w-full max-w-[600px] px-5 md:px-0">
         {username === user?.username && 
+          <>
           <div className="flex items-center justify-end">
             <button 
               className="text-xs md:text-sm font-bold hover:text-red-300"
@@ -124,8 +125,9 @@ export function Profile() {
               Sair da minha conta
             </button>
           </div>
+          <h2 className="text-xl md:text-2xl font-bold text-red-300 mt-10">Seus palpites</h2>
+          </>
         }
-      <h2 className="text-xl md:text-2xl font-bold text-red-300 mt-10">Seus palpites</h2>
        <DateSelect 
           initialDate={initialDate} 
           currentDate={currentDate}
