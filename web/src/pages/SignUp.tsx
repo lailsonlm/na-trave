@@ -27,6 +27,8 @@ export function SignUp() {
         console.log(error)
         if(error.response.status === 422) {
           formik.setStatus(error.response.data)
+        } else if(error.response.status === 409) {
+          formik.setStatus('Username ou e-mail já existe!')
         } else {
           formik.setStatus('Erro ao realizar o cadastro, tente novamente!')
         }

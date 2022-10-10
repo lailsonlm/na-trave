@@ -1,6 +1,6 @@
 import { createContext, ReactNode, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
-import { Navigate } from "react-router-dom";
+import { Navigate, redirect } from "react-router-dom";
 import { api } from "../services/api";
 
 type AuthProviderProps = {
@@ -10,7 +10,7 @@ type AuthProviderProps = {
 type AuthContextType = {
   isAuthenticated: boolean;
   user: User | undefined;
-  handleSignOut: () => void;
+  signOut: () => void;
   handleSignIn: (values: HandleSignInProps) => Promise<void>;
   handleSignUp: (values: HandleSignUpProps) => Promise<void>;
 }
@@ -72,12 +72,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
     })
   }
   
-  async function handleSignOut() {
+  function signOut() {
+    removeCookie('natrave.token') 
     setUser(undefined)
-    removeCookie('natrave.token')
-    Navigate({
-      to: '/login',
-    })    
   }
 
   async function getUser() {
@@ -89,7 +86,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setUser(response.data.user)
       })
       .catch((err) => {
-        handleSignOut()
+        signOut()
       })
   }
 
@@ -101,7 +98,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, handleSignOut, handleSignIn, handleSignUp }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, signOut, handleSignIn, handleSignUp }}>
       {children}
     </AuthContext.Provider>
   )

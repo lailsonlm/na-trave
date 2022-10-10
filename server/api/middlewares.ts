@@ -21,7 +21,7 @@ export async function checksExistsUserAccount(ctx: Context, next: Next) {
 
   if(emailExists || usernameExists) {
     ctx.body = "User already exists"
-    ctx.status = 200
+    ctx.status = 409
 
     return
   }

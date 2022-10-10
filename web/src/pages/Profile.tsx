@@ -1,6 +1,6 @@
 import { CircleNotch } from "phosphor-react";
 import { useContext, useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, redirect, useNavigate, useParams } from "react-router-dom";
 import { DateSelect } from "../components/DateSelect";
 import { Header } from "../components/Header";
 import { IconBack } from "../components/IconBack";
@@ -45,11 +45,17 @@ export function Profile() {
     return acc
   }, {} as any[string])
 
-  const { user, handleSignOut } = useContext(AuthContext)
+  const { user, signOut } = useContext(AuthContext)
   const navigate = useNavigate();
 
   function onChangeDateSelect(date: Date) {
     setCurrentDate(date)
+  }
+
+  function handleSignOut() {
+    signOut()
+
+    navigate('/login') 
   }
 
   // useEffect(() => {
@@ -59,8 +65,6 @@ export function Profile() {
   // }, [user])
   
   async function getAllGames() {
-    // setIsLoading(true)
-
     const response = await api.get<Game[]>('/games', {
       params: {
         gameTime: currentDate.toISOString()
@@ -68,14 +72,18 @@ export function Profile() {
     })
     setGames(response.data)
 
-    // setIsLoading(false)
   }
   
   async function getAllHunches() {
     setIsLoading(true)
 
-    const response = await api.get<Hunches>(`/hunches/${username}`)
-    setHunches(response.data)
+    try {
+      const response = await api.get<Hunches>(`/hunches/${username}`)
+      setHunches(response.data)
+    } catch (error) {
+      console.log(error)
+      navigate('*')
+    }
 
     setIsLoading(false)
   }

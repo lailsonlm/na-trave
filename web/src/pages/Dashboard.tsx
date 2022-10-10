@@ -52,16 +52,12 @@ export function Dashboard() {
   }, [user])
 
   async function getAllGames() {
-    // setIsLoading(true)
-
     const response = await api.get<Game[]>('/games', {
       params: {
         gameTime: currentDate.toISOString()
       }
     })
     setGames(response.data)
-
-    // setIsLoading(false)
   }
 
   async function getAllHunches() {

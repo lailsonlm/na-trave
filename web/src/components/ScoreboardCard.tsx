@@ -2,6 +2,7 @@ import { format } from "date-fns";
 import { useFormik } from "formik";
 import { FormEvent } from "react";
 import { useCookies } from "react-cookie";
+import { toast } from "react-toastify";
 import * as yup from 'yup'
 import { api } from "../services/api";
 
@@ -30,13 +31,22 @@ const validationSchema = yup.object({
 export function ScoreboardCard({ game, awayTeamScore, homeTeamScore, isProfilePage }: ScoreboardCardProps) {
   const formatHour = format(new Date(game.gameTime), "H':'mm")
   const [cookies] = useCookies(['natrave.token']);
+  const notify = () => toast("Wow so easy !");
+  
   const formik = useFormik({
     onSubmit: async (data) => {
       try {
-        handleSendHunch(data, game.id)
-        // await handleSignIn(values)
+        toast.promise(
+          handleSendHunch(data, game.id),
+          {
+            pending: 'Gravando palpite',
+            success: 'Palpite Salvo ⚽',
+            error: 'Erro ao gravar palpite 😢'
+          }
+        )
+        
       } catch (error) {
-        formik.setStatus('Erro ao gravar palpites!')
+        formik.setStatus('Erro ao gravar palpite!')
       }
     },
     validationSchema,
@@ -78,7 +88,7 @@ export function ScoreboardCard({ game, awayTeamScore, homeTeamScore, isProfilePa
             value={formik.values.homeTeamScore}
             onChange={formik.handleChange}
             onBlur={e => formik.handleSubmit(e.target.value as unknown as FormEvent<HTMLFormElement>)}
-            className={`text-center bg-red-300/[0.15] w-8 md:w-10 h-8 md:h-10 text-red-300 font-bold placeholder:text-red-300 ${formik.touched.homeTeamScore && formik.errors.homeTeamScore && "border-red-500 border-2"}`}
+            className={`text-right bg-red-300/[0.15] w-8 md:w-10 h-8 md:h-10 text-red-300 font-bold placeholder:text-red-300 disabled:cursor-not-allowed ${formik.touched.homeTeamScore && formik.errors.homeTeamScore && "border-red-500 border-2"}`}
           />
           <strong className="font-bold text-red-300">X</strong>
           <input 
@@ -89,7 +99,7 @@ export function ScoreboardCard({ game, awayTeamScore, homeTeamScore, isProfilePa
             value={formik.values.awayTeamScore}
             onChange={formik.handleChange}
             onBlur={e => formik.handleSubmit(e.target.value as unknown as FormEvent<HTMLFormElement>)}
-            className={`text-center bg-red-300/[0.15] w-8 md:w-10 h-8 md:h-10 text-red-300 font-bold placeholder:text-red-300 ${formik.touched.awayTeamScore && formik.errors.awayTeamScore && "border-red-500 border-2"}`}
+            className={`text-right bg-red-300/[0.15] w-8 md:w-10 h-8 md:h-10 text-red-300 font-bold placeholder:text-red-300 disabled:cursor-not-allowed ${formik.touched.awayTeamScore && formik.errors.awayTeamScore && "border-red-500 border-2"}`}
           />
         </form>
 
