@@ -114,6 +114,7 @@ export function Dashboard() {
                       game={game} 
                       homeTeamScore={hunch[game.id]?.homeTeamScore === 0 ? '0' : hunch[game.id]?.homeTeamScore || ''} 
                       awayTeamScore={hunch[game.id]?.awayTeamScore === 0 ? '0': hunch[game.id]?.awayTeamScore || ''} 
+                      currentDate={currentDate}
                     />
                   )
                 })}

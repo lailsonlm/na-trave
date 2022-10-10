@@ -1,6 +1,6 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { CircleNotch } from "phosphor-react";
+import { CircleNotch, Eye, EyeSlash } from "phosphor-react";
 import { useFormik } from "formik";
 import * as yup from 'yup'
 
@@ -14,6 +14,7 @@ const validationSchema = yup.object({
 })
 
 export function Login() {
+  const [showPassword, setShowPassword] = useState(false)
   const { user, handleSignIn } = useContext(AuthContext)
   const navigate = useNavigate();
 
@@ -79,16 +80,31 @@ export function Login() {
             >
               Sua senha
             </label>
-            <input 
-              type="password" 
-              id="password"
-              placeholder="Digite sua senha"
-              value={formik.values.password}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              disabled={formik.isSubmitting}
-              className="border border-gray-500 p-3 rounded-2xl placeholder:text-gray-700 text-red-700 focus:outline-red-500"
+
+            <div className="relative flex w-full rounded-md shadow-sm">
+              <input 
+                type={showPassword ? 'text' : 'password'}
+                id="password"
+                placeholder="Digite sua senha"
+                value={formik.values.password}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                disabled={formik.isSubmitting}
+                className="block w-full border border-gray-500 p-3 rounded-2xl placeholder:text-gray-700 text-red-700 focus:outline-red-500"
               />
+              <button 
+                type="button"
+                className="absolute inset-y-0 right-0 flex items-center pr-3 outline-none"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? 
+                  <EyeSlash className="text-red-300" weight="bold" size={20}/>
+                  : 
+                  <Eye className="text-red-300" weight="bold" size={20}/>
+                }
+                
+              </button>
+            </div>
               {formik.touched.password && formik.errors.password && <p className="text-red-500 text-sm">{formik.errors.password}</p> }
           </div>
 

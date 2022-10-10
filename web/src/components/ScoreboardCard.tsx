@@ -6,11 +6,6 @@ import { toast } from "react-toastify";
 import * as yup from 'yup'
 import { api } from "../services/api";
 
-
-type Hunches = {
-  awayTeamScore: number | string;
-  homeTeamScore: number | string;
-}
 interface ScoreboardCardProps {
   game: {
     id: string;
@@ -21,6 +16,7 @@ interface ScoreboardCardProps {
   awayTeamScore?: number | string;
   homeTeamScore?: number | string;
   isProfilePage?: boolean;
+  currentDate?: Date;
 }
 
 const validationSchema = yup.object({
@@ -28,16 +24,15 @@ const validationSchema = yup.object({
   awayTeamScore: yup.number().required('Favor, preencher placar do time visitante!'),
 })
 
-export function ScoreboardCard({ game, awayTeamScore, homeTeamScore, isProfilePage }: ScoreboardCardProps) {
+export function ScoreboardCard({ game, awayTeamScore, homeTeamScore, isProfilePage, currentDate }: ScoreboardCardProps) {
   const formatHour = format(new Date(game.gameTime), "H':'mm")
   const [cookies] = useCookies(['natrave.token']);
-  const notify = () => toast("Wow so easy !");
   
   const formik = useFormik({
     onSubmit: async (data) => {
       try {
         toast.promise(
-          handleSendHunch(data, game.id),
+          handleSendHunch(Number(data.awayTeamScore), Number(data.homeTeamScore) , game.id),
           {
             pending: 'Gravando palpite',
             success: 'Palpite Salvo ⚽',
@@ -57,10 +52,11 @@ export function ScoreboardCard({ game, awayTeamScore, homeTeamScore, isProfilePa
     }
   })
 
-  async function handleSendHunch(data: Hunches, gameId: string) {
+  async function handleSendHunch(awayTeamScore: number, homeTeamScore: number, gameId: string) {
     await api.post('/hunch', {
       gameId,
-      ...data
+      awayTeamScore,
+      homeTeamScore
     }, {
       headers: {
         Authorization: `Bearer ${cookies['natrave.token']}`
@@ -84,22 +80,22 @@ export function ScoreboardCard({ game, awayTeamScore, homeTeamScore, isProfilePa
             type="number" 
             min={0}
             name="homeTeamScore"
-            disabled={isProfilePage}
+            disabled={isProfilePage || currentDate && currentDate < new Date()}
             value={formik.values.homeTeamScore}
             onChange={formik.handleChange}
             onBlur={e => formik.handleSubmit(e.target.value as unknown as FormEvent<HTMLFormElement>)}
-            className={`text-right bg-red-300/[0.15] w-8 md:w-10 h-8 md:h-10 text-red-300 font-bold placeholder:text-red-300 disabled:cursor-not-allowed ${formik.touched.homeTeamScore && formik.errors.homeTeamScore && "border-red-500 border-2"}`}
+            className={`text-center bg-red-300/[0.15] w-8 md:w-10 h-8 md:h-10 text-red-300 font-bold placeholder:text-red-300 disabled:cursor-not-allowed ${formik.touched.homeTeamScore && formik.errors.homeTeamScore && "border-red-500 border-2"}`}
           />
           <strong className="font-bold text-red-300">X</strong>
           <input 
             type="number" 
             min={0}
             name="awayTeamScore"
-            disabled={isProfilePage}
+            disabled={isProfilePage || currentDate && currentDate < new Date()}
             value={formik.values.awayTeamScore}
             onChange={formik.handleChange}
             onBlur={e => formik.handleSubmit(e.target.value as unknown as FormEvent<HTMLFormElement>)}
-            className={`text-right bg-red-300/[0.15] w-8 md:w-10 h-8 md:h-10 text-red-300 font-bold placeholder:text-red-300 disabled:cursor-not-allowed ${formik.touched.awayTeamScore && formik.errors.awayTeamScore && "border-red-500 border-2"}`}
+            className={`text-center bg-red-300/[0.15] w-8 md:w-10 h-8 md:h-10 text-red-300 font-bold placeholder:text-red-300 disabled:cursor-not-allowed ${formik.touched.awayTeamScore && formik.errors.awayTeamScore && "border-red-500 border-2"}`}
           />
         </form>
 

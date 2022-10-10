@@ -82,6 +82,7 @@ router.post('/hunch', checksExistsGameId, async ctx => {
 
     const homeTeamScore = body.homeTeamScore as number
     const awayTeamScore = body.awayTeamScore as number
+
     const gameId = body.gameId as string
     const userId = data.sub as string
 
@@ -113,6 +114,7 @@ router.post('/hunch', checksExistsGameId, async ctx => {
       ctx.status = 200
 
     } catch (error) {
+      console.log(error)
       ctx.body = error
       ctx.status = 500
     }
